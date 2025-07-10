@@ -899,21 +899,21 @@ public class RedLeversScript : MonoBehaviour {
       {
          yield return new WaitForSeconds(0.1f);
          animators[k].SetBool("Flip", false);
-         Audio.PlaySoundAtTransform("Sound" + Rnd.Range(1, 6), transform);
+         Audio.PlaySoundAtTransform("Sound5", transform);
       }
       yield return new WaitForSeconds(0.05f);
       for (int k = 0; k < 8; k++)
       {
          yield return new WaitForSeconds(0.1f);
          animators[k].SetBool("Flip", true);
-         Audio.PlaySoundAtTransform("Sound" + Rnd.Range(1, 6), transform);
+         Audio.PlaySoundAtTransform("Sound5", transform);
       }
       yield return new WaitForSeconds(0.05f);
       for (int k = 0; k < 8; k++)
       {
          yield return new WaitForSeconds(0.1f);
          animators[k].SetBool("Flip", false);
-         Audio.PlaySoundAtTransform("Sound" + Rnd.Range(1, 6), transform);
+         Audio.PlaySoundAtTransform("Sound5", transform);
       }
    }
 
