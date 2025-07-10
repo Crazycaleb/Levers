@@ -1,0 +1,10 @@
+{
+  "name": "LeversSeries-Editor",
+  "references": [
+    "LeversSeries"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": []
+}
