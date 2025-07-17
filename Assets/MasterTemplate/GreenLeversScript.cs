@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using UnityEngine;
 using KModkit;
 using Rnd = UnityEngine.Random;
 
-public class YellowLeversScript : MonoBehaviour {
+public class GreenLeversScript : MonoBehaviour {
 
    public KMBombModule Module;
    public KMBombInfo Bomb;
@@ -72,10 +72,12 @@ public class YellowLeversScript : MonoBehaviour {
 
 
       //Adds yellow to the beginning of the list, since yellow is forced in the first position
-      colorOrder.Insert(0, 1);
-      Debug.LogFormat("Color Order: " + colorOrder.Join(","));
+      colorOrder.Insert(1, 0);
       yellowLevers++;
-      Debug.LogFormat("[Yellow Levers #{0}] Lever colors are {1}", ModuleId, colorString());
+      Debug.LogFormat("Red Levers = " + redLevers);
+      Debug.LogFormat("Yellow Levers = " + yellowLevers);
+      Debug.LogFormat("Green Levers = " + greenLevers);
+      Debug.LogFormat("Blue Levers = " + blueLevers);
       for (int i = 0; i < 8; i++)
       {
          Buttons[i].OnInteract += ButtonsPressed(i);
@@ -585,16 +587,6 @@ public class YellowLeversScript : MonoBehaviour {
    void LogReason(string reason)
    {
       Debug.LogFormat("[Yellow Levers #{0}] Checking row {1}: {2}", ModuleId, rowNumber, reason);
-   }
-
-   string colorString()
-   {
-      string output = "";
-      for (int i = 0; i < 8; i++)
-      {
-         output += "RYGB"[colorOrder[i]];
-      }
-      return output;
    }
 
 
