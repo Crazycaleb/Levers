@@ -617,7 +617,8 @@ public class YellowLeversScript : MonoBehaviour
                 animators[i].SetBool("Flip", true);
                 Audio.PlaySoundAtTransform("Sound" + Rnd.Range(1, 6), transform);
                 Debug.LogFormat("[Yellow Levers #{0}] Pressed lever #{1}. You weren't supposed to flip that! Strike! Goodbye, Mr. Anderson", ModuleId, i + 1);
-                StartCoroutine(strikeLoop());
+                if (!TwitchPlaysActive)
+                    StartCoroutine(strikeLoop());
             }
             else
             {
@@ -652,6 +653,7 @@ public class YellowLeversScript : MonoBehaviour
 #pragma warning disable 414
     private readonly string TwitchHelpMessage = @"!{0} flip 1 2 3 4 5 6 7 8 [Flip said levers, numbered 1-8 from left to right.]";
 #pragma warning restore 414
+    private bool TwitchPlaysActive;
 
     IEnumerator ProcessTwitchCommand(string command)
     {
@@ -680,6 +682,7 @@ public class YellowLeversScript : MonoBehaviour
         foreach (var sw in sws)
         {
             Buttons[sw].OnInteract();
+            if (sw == doNotFlip) yield return "detonate";
             yield return new WaitForSeconds(0.25f);
         }
     }
