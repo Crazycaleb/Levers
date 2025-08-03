@@ -407,11 +407,6 @@ public class GreenLeversScript : MonoBehaviour
             yield return "sendtochaterror Duplicate lever flips detected! Command ignored.";
             yield break;
         }
-        if (sws.Any(i => animators[i].GetBool("Flip")))
-        {
-            yield return "sendtochaterror Attempting to flip an already flipped lever! Command ignored.";
-            yield break;
-        }
         yield return null;
 
         foreach (var sw in sws)
