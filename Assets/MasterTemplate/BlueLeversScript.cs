@@ -26,14 +26,23 @@ public class BlueLeversScript : MonoBehaviour
 	private bool ModuleActivated;
 	List<int> colorOrder = new List<int>();
 	List<int> safeLevers = new List<int>();
+	int[] scores = new int[3];
 	DateTime today;
 	int todayDay;
+	string serial;
+	int fourth;
+	int leftmost;
+	int rightmost;
+	int rowNumber;
 	int leverA;
 	int leverB;
 	int leverC;
 	int scoreA = 1;
 	int scoreB = 1;
 	int scoreC = 1;
+	int a;
+	int b;
+	int c;
 	int answer;
 	int SNDigitSum;
 
@@ -70,9 +79,9 @@ public class BlueLeversScript : MonoBehaviour
 	void ModuleGeneration()
 	{
 		//Grab Safe Lever candidates
-		TableOne(colorOrder[1], colorOrder[2]);
-		TableOne(colorOrder[3], colorOrder[4]);
-		TableOne(colorOrder[6], colorOrder[5]);
+		TableOne(colorOrder[2], colorOrder[1]);
+		TableOne(colorOrder[4], colorOrder[3]);
+		TableOne(colorOrder[5], colorOrder[6]);
 
 		//Shift right if needed
 		uniqueCheck();
@@ -81,10 +90,18 @@ public class BlueLeversScript : MonoBehaviour
 		leverB = safeLevers[1];
 		leverC = safeLevers[2];
 
-		string indicators = Bomb.GetIndicators();
+		Debug.LogFormat("[Blue Levers #{0}] Safe lever candidates are {1}.", ModuleId, safeLevers.Select(x => x + 1).Join(", "));
+		a = leverA;
+		b = leverB;
+		c = leverC;
+		string indicators = Bomb.GetIndicators().ToString();
 		today = DateTime.Today;
 		todayDay = today.Day;
-		SNDigitsSum = Bomb.GetSerialNumberNumbers().Sum();
+		serial = Bomb.GetSerialNumber().ToUpper();
+		fourth = serial[3] - 'A' + 1;
+		SNDigitSum = Bomb.GetSerialNumberNumbers().Sum();
+
+
 
 
 		//Scoring time
@@ -117,7 +134,7 @@ public class BlueLeversScript : MonoBehaviour
 		}
 		if (Bomb.GetModuleNames().Any(x => x == "Red Levers"))
 		{
-			scoreA = Math.Ceiling(scoreA / 2);
+			scoreA = (int)Math.Ceiling(scoreA / 2d);
 		}
 		if (todayDay == 1)
 		{
@@ -149,7 +166,7 @@ public class BlueLeversScript : MonoBehaviour
 		{
 			scoreB -= 3;
 		}
-		if (Bomb.IsPortPresent(Port.DVID))
+		if (Bomb.IsPortPresent(Port.DVI))
 		{
 			scoreB -= 1;
 		}
@@ -159,7 +176,7 @@ public class BlueLeversScript : MonoBehaviour
 		}
 		if (Bomb.GetModuleNames().Any(x => x == "Green Levers"))
 		{
-			scoreB = Math.Floor(scoreB / 2);
+			scoreB = (int)Math.Floor(scoreB / 2d);
 		}
 		if (todayDay == 15)
 		{
@@ -169,9 +186,9 @@ public class BlueLeversScript : MonoBehaviour
 		{
 			scoreB += 5;
 		}
-		if (Bomb.GetModuleNames().Any(x => x == "Forget Me Not")) //Think of a new score for this+figure out needy check
+		if (Bomb.GetModuleNames().Count - Bomb.GetSolvableModuleNames().Count() >= 1) //Subtract the 4th character of the serial number
 		{
-			scoreB -= SNDigitSum;
+			scoreB -= fourth;
 		}
 
 		//Candidate C
@@ -201,7 +218,7 @@ public class BlueLeversScript : MonoBehaviour
 		}
 		if (Bomb.GetModuleNames().Any(x => x == "Yellow Levers"))//Round Normally
 		{
-			scoreC = (int)Math.Round(scoreC / 2);
+			scoreC = (int)Math.Round(scoreC / 2d);
 		}
 		if (todayDay == 29)
 		{
@@ -211,99 +228,97 @@ public class BlueLeversScript : MonoBehaviour
 		{
 			scoreC += 7;
 		}
-		if (Bomb.GetModuleNames().Any(x => x == "Forget Me Not")) //figure out vanilla check
+		if (Bomb.GetModuleIDs().ToArray().Intersect(new[] { "WireSequence", "Wires", "WhosOnFirst", "NeedyVentGas", "Simon", "Password", "Morse", "Memory", "Maze", "NeedyKnob", "Keypad", "Venn", "NeedyCapacitor", "BigButton" }).Any()) //figure out vanilla check
 		{
-			scoreC -= SNDigitSum;
+			scoreC -= Bomb.GetModuleIDs().ToArray().Intersect(new[] { "WireSequence", "Wires", "WhosOnFirst", "NeedyVentGas", "Simon", "Password", "Morse", "Memory", "Maze", "NeedyKnob", "Keypad", "Venn", "NeedyCapacitor", "BigButton" }).Count();
 		}
+
+		//Checks for first removal
+
+		scores[0] = scoreA;
+		scores[1] = scoreB;
+		scores[2] = scoreC;
+
+		Debug.LogFormat("[Blue Levers #{0}] Final score for A: {1}", ModuleId, scoreA);
+		Debug.LogFormat("[Blue Levers #{0}] Final score for B: {1}", ModuleId, scoreB);
+		Debug.LogFormat("[Blue Levers #{0}] Final score for C: {1}", ModuleId, scoreC);
+
+		if (scoreA != scoreB || scoreA != scoreC || scoreB != scoreC)
+		{
+			if (scoreA < scoreB && scoreA < scoreC)
+			{
+				safeLevers.RemoveAt(0);
+				Debug.LogFormat("[Blue Levers #{0}] Removing candidate A from consideration.", ModuleId);
+			}
+			else if (scoreB < scoreA && scoreB < scoreC)
+			{
+				safeLevers.RemoveAt(1);
+				Debug.LogFormat("[Blue Levers #{0}] Removing candidate B from consideration.", ModuleId);
+			}
+			else
+			{
+				safeLevers.RemoveAt(2);
+				Debug.LogFormat("[Blue Levers #{0}] Removing candidate C from consideration.", ModuleId);
+			}
+		}
+		else if (scoreA == scoreB)
+		{
+			safeLevers.RemoveAt(2);
+			Debug.LogFormat("[Blue Levers #{0}] Removing candidate C from consideration.", ModuleId);
+		}
+		else if (scoreA == scoreC)
+		{
+			safeLevers.RemoveAt(1);
+			Debug.LogFormat("[Blue Levers #{0}] Removing candidate B from consideration.", ModuleId);
+		}
+		else if (scoreB == scoreC)
+		{
+			safeLevers.RemoveAt(0);
+			Debug.LogFormat("[Blue Levers #{0}] Removing candidate A from consideration.", ModuleId);
+		}
+		else
+		{
+			int lastDigit = Bomb.GetSerialNumber().Last();
+			safeLevers.RemoveAt(lastDigit % 3);
+			Debug.LogFormat("[Blue Levers #{0}] Removing candidate {1} from consideration.", ModuleId, characterString(lastDigit % 3));
+		}
+
+		Debug.LogFormat("[Blue Levers #{0}] Current safe lever candidates are {1}.", ModuleId, safeLevers.Select(x => x + 1).Join(" and "));
+
+		//Final step
+		if (safeLevers[0] < safeLevers[1])
+		{
+			leftmost = safeLevers[0];
+			rightmost = safeLevers[1];
+		}
+		else
+		{
+			leftmost = safeLevers[1];
+			rightmost = safeLevers[0];
+		}
+
+		TableTwo(colorOrder[rightmost], colorOrder[leftmost]);
+		Debug.LogFormat("[Blue Levers #{0}] Using row {1} for the final table", ModuleId, rowString(rowNumber));
+		TableThree(rowNumber, colorOrder[7]);
+
+		Debug.LogFormat("[Blue Levers #{0}] The correct lever to flip is: {1}", ModuleId, answer + 1);
 	}
+
+
+
+
 
 	void TableOne(int i, int j)
 	{
-		//i is columns, j is rows
+		//i is rows, j is columns
 
-		//Red
-		if (i == 0)
-		{
-			if (j == 3)
-			{
-				safeLevers.Add(0);
-			}
-			else if (j == 2)
-			{
-				safeLevers.Add(3);
-			}
-			else if (j == 1)
-			{
-				safeLevers.Add(2);
-			}
-			else
-			{
-				safeLevers.Add(1);
-			}
-		}
-
-		//Yellow
-		else if (i == 1)
-		{
-			if (j == 3)
-			{
-				safeLevers.Add(5);
-			}
-			else if (j == 2)
-			{
-				safeLevers.Add(6);
-			}
-			else if (j == 1)
-			{
-				safeLevers.Add(7);
-			}
-			else
-			{
-				safeLevers.Add(4);
-			}
-		}
-
-		//Green
-		else if (i == 2)
-		{
-			if (j == 3)
-			{
-				safeLevers.Add(2);
-			}
-			else if (j == 2)
-			{
-				safeLevers.Add(5);
-			}
-			else if (j == 1)
-			{
-				safeLevers.Add(0);
-			}
-			else
-			{
-				safeLevers.Add(3);
-			}
-		}
-
-		//Blue
-		else
-		{
-			if (j == 3)
-			{
-				safeLevers.Add(7);
-			}
-			else if (j == 2)
-			{
-				safeLevers.Add(1);
-			}
-			else if (j == 1)
-			{
-				safeLevers.Add(4);
-			}
-			else
-			{
-				safeLevers.Add(6);
-			}
-		}
+		int[][] table = new int[4][]{
+			new int[] { 1, 4, 3, 6 },
+			new int[] { 2, 7, 0, 4 },
+			new int[] { 3, 6, 5, 1 },
+			new int[] { 0, 5, 2, 7 },
+		};
+		safeLevers.Add(table[i][j]);
 	}
 
 	void uniqueCheck()
@@ -342,6 +357,56 @@ public class BlueLeversScript : MonoBehaviour
         }
 	}
 
+
+	//Determines row used in final table
+
+	void TableTwo(int i, int j)
+	{
+		int[][] table = new int[4][]{
+			new int[] { 4, 3, 7, 6 },
+			new int[] { 7, 6, 3, 0 },
+			new int[] { 2, 1, 5, 4 },
+			new int[] { 0, 5, 1, 2 },
+		};
+		rowNumber = table[i][j];
+	}
+
+	void TableThree(int i, int j)
+	{
+		int[][] primaryTable = new int[][]{
+			new int[] { a, b, c, b },
+			new int[] { c, b, a, c },
+			new int[] { b, c, b, a },
+			new int[] { b, a, c, c },
+			new int[] { c, b, a, a },
+			new int[] { c, b, b, c },
+			new int[] { a, c, c, b },
+			new int[] { a, c, b, a },
+		};
+
+		answer = primaryTable[i][j];
+
+
+
+		int[][] secondaryTable = new int[][]{
+			new int[] { b, c, a, a },
+			new int[] { b, a, c, a },
+			new int[] { a, a, a, c },
+			new int[] { c, b, a, b },
+			new int[] { b, c, c, b },
+			new int[] { a, a, c, a },
+			new int[] { b, b, a, c },
+			new int[] { c, a, a, b },
+		};
+		
+		if (!safeLevers.Contains(answer))
+		{
+			answer = secondaryTable[i][j];
+		}
+	}
+
+	//Logging purposes
+
 	string colorString()
 	{
 		string output = "";
@@ -350,6 +415,16 @@ public class BlueLeversScript : MonoBehaviour
 			output += "RYGB"[colorOrder[i]];
 		}
 		return output;
+	}
+
+	string characterString(int i)
+	{
+		return "ABC"[i].ToString();
+	}
+
+	string rowString(int i)
+	{
+		return "ABCDEFGH"[i].ToString();
 	}
 
 
