@@ -616,9 +616,8 @@ public class YellowLeversScript : MonoBehaviour
                 fuckedUp = true;
                 animators[i].SetBool("Flip", true);
                 Audio.PlaySoundAtTransform("Sound" + Rnd.Range(1, 6), transform);
-                Debug.LogFormat("[Yellow Levers #{0}] Pressed lever #{1}. You weren't supposed to flip that! Strike! Goodbye, Mr. Anderson", ModuleId, i + 1);
-                if (!TwitchPlaysActive)
-                    StartCoroutine(strikeLoop());
+                Debug.LogFormat("[Yellow Levers #{0}] Pressed lever #{1}. You weren't supposed to flip that! Strike!", ModuleId, i + 1);
+                Module.HandleStrike();
             }
             else
             {
@@ -639,15 +638,6 @@ public class YellowLeversScript : MonoBehaviour
 
             return false;
         };
-    }
-
-    private IEnumerator strikeLoop()
-    {
-        while (fuckedUp)
-        {
-            Module.HandleStrike();
-            yield return new WaitForSeconds(1.0f);
-        }
     }
 
 #pragma warning disable 414
@@ -682,7 +672,6 @@ public class YellowLeversScript : MonoBehaviour
         foreach (var sw in sws)
         {
             Buttons[sw].OnInteract();
-            if (sw == doNotFlip) yield return "detonate";
             yield return new WaitForSeconds(0.25f);
         }
     }
