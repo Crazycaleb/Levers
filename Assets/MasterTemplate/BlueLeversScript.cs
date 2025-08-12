@@ -81,10 +81,9 @@ public class BlueLeversScript : MonoBehaviour
         //Grab Safe Lever candidates
         TableOne(colorOrder[2], colorOrder[1]);
         TableOne(colorOrder[4], colorOrder[3]);
-        TableOne(colorOrder[5], colorOrder[6]);
-
-        //Shift right if needed
         uniqueCheck();
+        TableOne(colorOrder[5], colorOrder[6]);
+        uniqueCheck2();
 
         leverA = safeLevers[0];
         leverB = safeLevers[1];
@@ -335,10 +334,14 @@ public class BlueLeversScript : MonoBehaviour
             {
                 candidate = (candidate + 1) % 8;
             }
-
+            
             safeLevers[1] = candidate;
             Debug.LogFormat("[Blue Levers #{0}] New second safe lever candidate after special adjustment: {1}", ModuleId, candidate + 1);
         }
+    }
+
+    void uniqueCheck2()
+    {
         if (safeLevers[2] == safeLevers[0] || safeLevers[2] == safeLevers[1])
         {
 
@@ -351,10 +354,9 @@ public class BlueLeversScript : MonoBehaviour
             {
                 candidate = (candidate + 1) % 8;
             }
-
             safeLevers[2] = candidate;
             Debug.LogFormat("[Blue Levers #{0}] New third safe lever candidate after special adjustment: {1}", ModuleId, candidate + 1);
-        }
+        } 
     }
 
 
