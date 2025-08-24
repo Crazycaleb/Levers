@@ -93,7 +93,7 @@ public class BlueLeversScript : MonoBehaviour
         a = leverA;
         b = leverB;
         c = leverC;
-        string indicators = Bomb.GetIndicators().ToString();
+        string indicators = Bomb.GetIndicators().Join("");
         today = DateTime.Today;
         todayDay = today.Day;
         serial = Bomb.GetSerialNumber().ToUpper();
@@ -110,126 +110,156 @@ public class BlueLeversScript : MonoBehaviour
         if (colorOrder[leverA] == 0)
         {
             scoreA += 1;
+            Debug.LogFormat("[Blue Levers #{0}] Candidate A is red. Adding 1 to Candidate A's score.", ModuleId);
         }
         if (leverA == 1)
         {
             scoreA += 3;
+            Debug.LogFormat("[Blue Levers #{0}] Candidate A is the second lever. Adding 3 to Candidate A's score.", ModuleId);
         }
         if (colorOrder[7] == 0)
         {
             scoreA += 5;
+            Debug.LogFormat("[Blue Levers #{0}] Last lever is red. Adding 5 to Candidate A's score.", ModuleId);
         }
         if (indicators.Contains("IND"))
         {
             scoreA -= 2;
+            Debug.LogFormat("[Blue Levers #{0}] IND indicator is present. Subtracting 2 from Candidate A's score.", ModuleId);
         }
         if (Bomb.IsPortPresent(Port.Serial))
         {
             scoreA -= 2;
+            Debug.LogFormat("[Blue Levers #{0}] Serial port is present. Subtracting 2 from Candidate A's score.", ModuleId);
         }
         if (Bomb.GetPortPlates().Count() > 1)
         {
             scoreA += Bomb.GetBatteryCount();
+            Debug.LogFormat("[Blue Levers #{0}] More than 1 port plate is present. Adding the amount of batteries [{1}] to Candidate A's score.", ModuleId, Bomb.GetBatteryCount());
         }
         if (Bomb.GetModuleNames().Any(x => x == "Red Levers"))
         {
             scoreA = (int)Math.Ceiling(scoreA / 2d);
+            Debug.LogFormat("[Blue Levers #{0}] Red Levers module is present on the bomb. Dividing Candidate A's score by 2 and rounding up.", ModuleId);
         }
         if (todayDay == 1)
         {
             scoreA += 10;
+            Debug.LogFormat("[Blue Levers #{0}] Bomb was generated on the 1st of the month. Adding 10 to Candidate A's score.", ModuleId);
         }
         if (colorOrder[leverC] == 3)
         {
             scoreA += 6;
+            Debug.LogFormat("[Blue Levers #{0}] Candidate C's color is blue. Adding 6 to Candidate A's score.", ModuleId);
         }
         if (Bomb.GetModuleNames().Any(x => x == "Forget Me Not"))
         {
             scoreA -= SNDigitSum;
+            Debug.LogFormat("[Blue Levers #{0}] A Forget Me Not is present on the bomb. Subtracting the sum of the serial number digits [{1}] from Candidate A's score.", ModuleId, SNDigitSum);
         }
 
         //Candidate B
         if (colorOrder[leverB] == 2)
         {
             scoreB += 2;
+            Debug.LogFormat("[Blue Levers #{0}] Candidate B's lever is green. Adding 2 to Candidate B's score.", ModuleId);
         }
         if (leverB == 7)
         {
             scoreB += 2;
+            Debug.LogFormat("[Blue Levers #{0}] Candidate B's position is the last lever. Adding 2 to Candidate B's score.", ModuleId);
         }
         if (colorOrder[7] == 2)
         {
             scoreB += 6;
+            Debug.LogFormat("[Blue Levers #{0}] The last lever is green. Adding 6 to Candidate B's score.", ModuleId);
         }
         if (indicators.Contains("SIG"))
         {
             scoreB -= 3;
+            Debug.LogFormat("[Blue Levers #{0}] SIG indicator is present. Subtracting 3 from Candidate B's score.", ModuleId);
         }
         if (Bomb.IsPortPresent(Port.DVI))
         {
             scoreB -= 1;
+            Debug.LogFormat("[Blue Levers #{0}] DVI-D port is present. Subtracting 1 from Candidate B's score.", ModuleId);
         }
         if (Bomb.GetIndicators().Count() > 1)
         {
             scoreB += Bomb.GetPortPlates().Count();
+            Debug.LogFormat("[Blue Levers #{0}] Indicator count is greater than 1. Adding the number of port plates [{1}] to Candidate B's score.", ModuleId, Bomb.GetPortPlates().Count());
         }
         if (Bomb.GetModuleNames().Any(x => x == "Green Levers"))
         {
             scoreB = (int)Math.Floor(scoreB / 2d);
+            Debug.LogFormat("[Blue Levers #{0}] Green Levers module is present on the bomb. Dividing Candidate B's score by 2, rounding down.", ModuleId);
         }
         if (todayDay == 15)
         {
             scoreB += 11;
+            Debug.LogFormat("[Blue Levers #{0}] Bomb was generated on the 15th day of the month. Adding 11 to Candidate B's score.", ModuleId);
         }
         if (colorOrder[leverA] == 1)
         {
             scoreB += 5;
+            Debug.LogFormat("[Blue Levers #{0}] Candidate A's color is yellow. Adding 5 to Candidate B's score.", ModuleId);
         }
         if (Bomb.GetModuleNames().Count - Bomb.GetSolvableModuleNames().Count() >= 1) //Subtract the 4th character of the serial number
         {
             scoreB -= fourth;
+            Debug.LogFormat("[Blue Levers #{0}] Needy module is present on the bomb. Subtracting the alphabetic position of the 4th character of the serial number [{1}] from Candidate B's score.", ModuleId, fourth);
         }
 
         //Candidate C
         if (colorOrder[leverC] != 3)
         {
             scoreC += 3;
+            Debug.LogFormat("[Blue Levers #{0}] Candidate C's lever color is not blue. Adding 3 to Candidate C's score.", ModuleId);
         }
-        if (leverB != 5)
+        if (leverC != 5)
         {
             scoreC += 1;
+            Debug.LogFormat("[Blue Levers #{0}] Candidate C's position is not the 6th. Adding 1 to Candidate C's score.", ModuleId);
         }
         if (colorOrder[7] == 1)
         {
             scoreC += 5;
+            Debug.LogFormat("[Blue Levers #{0}] The last lever's color is yellow. Adding 5 to Candidate C's score.", ModuleId);
         }
         if (indicators.Contains("FRK"))
         {
             scoreC -= 1;
+            Debug.LogFormat("[Blue Levers #{0}] FRK indicator is present. Subtracting 1 from Candidate C's score.", ModuleId);
         }
         if (Bomb.IsPortPresent(Port.PS2))
         {
             scoreC -= 3;
+            Debug.LogFormat("[Blue Levers #{0}] PS/2 port is present. Subtracting 3 from Candidate C's score.", ModuleId);
         }
         if (Bomb.GetBatteryCount() > 1)
         {
             scoreC += Bomb.GetIndicators().Count();
+            Debug.LogFormat("[Blue Levers #{0}] More than 1 battery is on the bomb. Adding the number of indicators [{1}] to Candidate C's score.", ModuleId, Bomb.GetIndicators().Count());
         }
         if (Bomb.GetModuleNames().Any(x => x == "Yellow Levers"))//Round Normally
         {
-            scoreC = (int)Math.Round(scoreC / 2d);
+            scoreC = Mathf.RoundToInt(scoreC / 2f);
+            Debug.LogFormat("[Blue Levers #{0}] Yellow Levers module is present on the bomb. Dividing Candidate C's score by 2, rounding normally.", ModuleId);
         }
         if (todayDay == 29)
         {
             scoreC += 10;
+            Debug.LogFormat("[Blue Levers #{0}] Bomb was generated on the 29th day of the month. Adding 10 to Candidate C's score.", ModuleId);
         }
         if (colorOrder[leverB] == 0)
         {
             scoreC += 7;
+            Debug.LogFormat("[Blue Levers #{0}] Candidate B's color is red. Adding 7 to Candidate C's score.", ModuleId);
         }
         if (Bomb.GetModuleIDs().ToArray().Intersect(new[] { "WireSequence", "Wires", "WhosOnFirst", "NeedyVentGas", "Simon", "Password", "Morse", "Memory", "Maze", "NeedyKnob", "Keypad", "Venn", "NeedyCapacitor", "BigButton" }).Any()) //figure out vanilla check
         {
             scoreC -= Bomb.GetModuleIDs().ToArray().Intersect(new[] { "WireSequence", "Wires", "WhosOnFirst", "NeedyVentGas", "Simon", "Password", "Morse", "Memory", "Maze", "NeedyKnob", "Keypad", "Venn", "NeedyCapacitor", "BigButton" }).Count();
+            Debug.LogFormat("[Blue Levers #{0}] At least 1 vanilla module is present on the bomb. Subtracting the total amount of vanilla modules on the bomb [{1}] from Candidate C's score.", ModuleId, Bomb.GetModuleIDs().ToArray().Intersect(new[] { "WireSequence", "Wires", "WhosOnFirst", "NeedyVentGas", "Simon", "Password", "Morse", "Memory", "Maze", "NeedyKnob", "Keypad", "Venn", "NeedyCapacitor", "BigButton" }).Count());
         }
 
         //Checks for first removal
@@ -238,9 +268,9 @@ public class BlueLeversScript : MonoBehaviour
         scores[1] = scoreB;
         scores[2] = scoreC;
 
-        Debug.LogFormat("[Blue Levers #{0}] Final score for A: {1}", ModuleId, scoreA);
-        Debug.LogFormat("[Blue Levers #{0}] Final score for B: {1}", ModuleId, scoreB);
-        Debug.LogFormat("[Blue Levers #{0}] Final score for C: {1}", ModuleId, scoreC);
+        Debug.LogFormat("[Blue Levers #{0}] Final score for A: {1}", ModuleId, scores[0]);
+        Debug.LogFormat("[Blue Levers #{0}] Final score for B: {1}", ModuleId, scores[1]);
+        Debug.LogFormat("[Blue Levers #{0}] Final score for C: {1}", ModuleId, scores[2]);
 
         if (scoreA != scoreB || scoreA != scoreC || scoreB != scoreC)
         {
