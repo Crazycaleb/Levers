@@ -243,7 +243,7 @@ public class BlueLeversScript : MonoBehaviour
         }
         if (Bomb.GetModuleNames().Any(x => x == "Yellow Levers"))//Round Normally
         {
-            scoreC = Mathf.RoundToInt(scoreC / 2f);
+            scoreC = (int)Math.Round(scoreC / 2.0, MidpointRounding.AwayFromZero);
             Debug.LogFormat("[Blue Levers #{0}] Yellow Levers module is present on the bomb. Dividing Candidate C's score by 2, rounding normally.", ModuleId);
         }
         if (todayDay == 29)
